@@ -1,0 +1,8 @@
+# Claude Code 로컬 설정 (권한 기록 등, 공개하지 않음)
+.claude/settings.local.json
+
+# OS / 편집기
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
