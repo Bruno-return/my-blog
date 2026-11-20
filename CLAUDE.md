@@ -187,6 +187,15 @@ node import-obsidian.mjs
   - `==하이라이트==`: 굵게 바꿉니다.
 - 원본 노트는 이 스크립트로만 바꿉니다. 그 밖의 보관함 파일은 수정하지 않습니다.
 
+## 배포 (GitHub Pages)
+
+- 공개 주소: https://bruno-return.github.io/my-blog/
+- 저장소: https://github.com/Bruno-return/my-blog (공개, `main` 브랜치 루트를 Pages로 배포)
+- `main`에 push하면 1분 안팎으로 사이트에 반영됩니다. **새 글은 push하기 전까지 내 컴퓨터에만 있습니다.**
+- push는 공개 게시이므로 사용자가 요청하거나 허락한 경우에만 합니다.
+- `.nojekyll`은 지우지 않습니다. 지우면 GitHub Pages가 `posts/*.md`를 Jekyll로 변환해 블로그가 글을 읽지 못합니다.
+- `.claude/settings.local.json`은 `.gitignore`로 제외합니다.
+
 ## 이미지 경로
 
 - 글 안의 이미지는 `assets/`에 두고, 글 파일 기준 상대 경로 `../assets/파일.png`로 씁니다.
