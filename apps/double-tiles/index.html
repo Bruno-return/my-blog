@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Double Tiles</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./ui.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="title-row">
+        <h1>Double Tiles</h1>
+        <button type="button" id="new-game" class="btn">새 게임</button>
+      </div>
+      <p class="subtitle">같은 숫자를 밀어 합치세요</p>
+    </header>
+
+    <main>
+      <dl class="scoreboard">
+        <div class="score-box">
+          <dt>점수</dt>
+          <dd><span id="score" class="score-value">0</span><span id="score-add" class="score-add" aria-hidden="true"></span></dd>
+        </div>
+        <div class="score-box">
+          <dt>최고</dt>
+          <dd><span id="best" class="score-value">0</span></dd>
+        </div>
+        <div class="score-box target-box" id="target-badge">
+          <dt>다음 목표</dt>
+          <dd><span id="target" class="score-value">64</span><span id="stage" class="stage-label">1단계</span></dd>
+        </div>
+      </dl>
+
+      <div class="board-wrap">
+        <div id="board" tabindex="0" role="group" aria-label="4×4 게임 격자" aria-describedby="help">
+          <div class="cells" aria-hidden="true">
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          </div>
+          <div id="tiles" class="tiles" aria-hidden="true"></div>
+        </div>
+
+        <div id="game-over" class="game-over" hidden role="dialog" aria-modal="false" aria-labelledby="go-title">
+          <div class="game-over-box">
+            <h2 id="go-title">더 이상 움직일 수 없어요</h2>
+            <p id="go-summary">점수 0 · 1단계</p>
+            <p id="go-max">최고 타일 2</p>
+            <button type="button" id="restart" class="btn">다시 시작</button>
+          </div>
+        </div>
+      </div>
+
+      <p id="help" class="help">방향키·WASD 또는 스와이프로 이동해요. 격자를 한 번 누르면 키보드로 조작할 수 있어요.</p>
+    </main>
+
+    <div id="sr-status" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+    <div id="sr-alert" class="visually-hidden" aria-live="assertive"></div>
+  </div>
+</body>
+</html>

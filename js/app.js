@@ -190,10 +190,17 @@ function postListHtml(posts) {
 
 // ===== 페이지 =====
 
+// index.html의 <template id="app-cards">에 있는 미니 웹앱 카드
+function appCardsHtml() {
+  const template = document.getElementById('app-cards');
+  return template ? template.innerHTML : '';
+}
+
 function renderHome(posts) {
   setTitle('');
   if (!posts.length) {
     app.innerHTML = `
+      ${appCardsHtml()}
       <div class="notice">
         <h1>아직 글이 없어요</h1>
         <p><code>posts/</code> 폴더에 마크다운 글을 추가하고 <code>posts/index.json</code>에 파일 이름을 등록해 주세요.</p>
@@ -201,6 +208,7 @@ function renderHome(posts) {
     return;
   }
   app.innerHTML = `
+    ${appCardsHtml()}
     <h1 class="page-heading">최근 글</h1>
     <p class="page-sub">글 ${posts.length}개</p>
     ${postListHtml(posts)}`;
