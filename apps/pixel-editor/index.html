@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Pixel Editor</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./js/ui.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="top-bar">
+      <h1 class="app-title">Pixel Editor</h1>
+      <div class="current-color" id="current-color">
+        <span class="current-swatch" id="current-swatch" aria-hidden="true"></span>
+        <span class="current-text" id="current-text">검정 #000000</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="canvas-area" aria-label="캔버스">
+        <canvas id="pixel-canvas" class="pixel-canvas" width="480" height="480"
+          aria-label="16×16 픽셀 캔버스" aria-describedby="canvas-help"></canvas>
+        <p id="canvas-help" class="visually-hidden">누르거나 드래그해서 칠하세요</p>
+      </section>
+
+      <div class="panel">
+        <section class="panel-section" aria-label="도구">
+          <h2 class="panel-heading">도구</h2>
+          <div class="tool-row">
+            <div class="tool-group" role="group" aria-label="도구">
+              <button type="button" class="tool-button" data-tool="pen" aria-pressed="true" aria-label="펜 (B)" title="펜 (B)">
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 20l1-5L16 4l4 4L9 19l-5 1zM14 6l4 4"/></svg>
+                <span class="tool-label">펜</span>
+              </button>
+              <button type="button" class="tool-button" data-tool="eraser" aria-pressed="false" aria-label="지우개 (E)" title="지우개 (E)">
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M8 20h12M5 15l9-9 5 5-9 9H8l-3-3a1.4 1.4 0 0 1 0-2zM9 11l5 5"/></svg>
+                <span class="tool-label">지우개</span>
+              </button>
+              <button type="button" class="tool-button" data-tool="fill" aria-pressed="false" aria-label="채우기 (G)" title="채우기 (G)">
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12l7-7 7 7-7 7-7-7zM5 12h14M20 16s-2 2.5-2 3.5a2 2 0 0 0 4 0c0-1-2-3.5-2-3.5z"/></svg>
+                <span class="tool-label">채우기</span>
+              </button>
+              <button type="button" class="tool-button" data-tool="picker" aria-pressed="false" aria-label="스포이트 (I)" title="스포이트 (I)">
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 4l6 6M12 6l6 6M16 3a2.1 2.1 0 0 1 5 5l-3 3-5-5 3-3zM13 9l-8 8v3h3l8-8"/></svg>
+                <span class="tool-label">스포이트</span>
+              </button>
+            </div>
+            <div class="history-group">
+              <button type="button" class="tool-button" id="undo-button" aria-label="되돌리기 (Ctrl+Z)" title="되돌리기 (Ctrl+Z)" disabled>
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/></svg>
+                <span class="tool-label">되돌리기</span>
+              </button>
+              <button type="button" class="tool-button" id="redo-button" aria-label="다시 실행 (Ctrl+Shift+Z)" title="다시 실행 (Ctrl+Shift+Z)" disabled>
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 14l5-5-5-5M20 9H10a6 6 0 0 0 0 12h3"/></svg>
+                <span class="tool-label">다시 실행</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-section" aria-label="팔레트 영역">
+          <h2 class="panel-heading">팔레트</h2>
+          <div class="palette" id="palette" role="group" aria-label="팔레트">
+            <label class="custom-color" id="custom-color-wrap" title="사용자 지정 색">
+              <svg class="custom-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 5v14M5 12h14"/></svg>
+              <input type="color" id="custom-color" class="custom-input" value="#ff6f00" aria-label="사용자 지정 색 (현재 #ff6f00)">
+            </label>
+          </div>
+        </section>
+
+        <section class="panel-section" aria-label="내보내기">
+          <h2 class="panel-heading">내보내기</h2>
+          <div class="action-row">
+            <button type="button" class="action-button" id="grid-button" aria-pressed="true" title="격자선 (#)">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" d="M4 4h16v16H4zM4 12h16M12 4v16"/></svg>
+              <span>격자</span>
+            </button>
+            <button type="button" class="action-button danger" id="clear-button" aria-label="전체 지우기">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
+              <span class="clear-label"><span class="clear-prefix">전체 </span>지우기</span>
+            </button>
+            <label class="scale-field">
+              <span class="scale-label">배율</span>
+              <select id="scale-select" class="scale-select">
+                <option value="1">1×(16px)</option>
+                <option value="8">8×(128px)</option>
+                <option value="16" selected>16×(256px)</option>
+                <option value="32">32×(512px)</option>
+              </select>
+            </label>
+            <button type="button" class="action-button primary" id="save-button">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+              <span>PNG 저장</span>
+            </button>
+          </div>
+          <p class="save-error" id="save-error" hidden>
+            저장할 수 없습니다. 새 탭에서 열어 다시 시도해 주세요.
+            <a href="./" target="_blank" rel="noopener">새 탭에서 열기</a>
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <div class="visually-hidden" id="announcer" aria-live="polite"></div>
+  </div>
+</body>
+</html>

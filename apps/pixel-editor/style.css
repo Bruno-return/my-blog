@@ -1,0 +1,484 @@
+/* Pixel Editor — 모바일 우선, 색은 모두 CSS 변수 */
+
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --surface: #f3f4f6;
+  --surface-hover: #e5e7eb;
+  --text: #1f2328;
+  --muted: #656d76;
+  --border: #d0d7de;
+  --accent: #2563eb;
+  --accent-text: #ffffff;
+  --focus: #2563eb;
+  --danger: #b91c1c;
+  --checker-a: #ffffff;
+  --checker-b: #e3e5e8;
+  --grid-line: rgba(0, 0, 0, 0.18);
+  --canvas-frame: #9ca3af;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115;
+    --surface: #1b1f27;
+    --surface-hover: #262b36;
+    --text: #e6e6e6;
+    --muted: #9aa4b2;
+    --border: #2a2f3a;
+    --accent: #6ea8fe;
+    --accent-text: #0f1115;
+    --focus: #6ea8fe;
+    --danger: #f87171;
+    --checker-a: #3a3f4b;
+    --checker-b: #2c313b;
+    --grid-line: rgba(255, 255, 255, 0.16);
+    --canvas-frame: #4b5563;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard",
+    "Noto Sans KR", "Malgun Gothic", sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  overflow-x: hidden;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.app {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 8px 16px 16px;
+}
+
+/* 상단 바 */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  margin-bottom: 8px;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.current-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.current-text {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  white-space: nowrap;
+}
+
+.current-swatch {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--swatch, transparent);
+}
+
+.current-swatch.is-transparent {
+  background-color: var(--checker-a);
+  background-image: conic-gradient(var(--checker-b) 25%, var(--checker-a) 0 50%, var(--checker-b) 0 75%, var(--checker-a) 0);
+  background-size: 10px 10px;
+}
+
+/* 레이아웃 */
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.canvas-area {
+  display: flex;
+  justify-content: center;
+}
+
+.pixel-canvas {
+  display: block;
+  width: min(100%, 480px, calc(100dvh - 300px));
+  min-width: 224px;
+  max-width: 100%;
+  aspect-ratio: 1;
+  height: auto;
+  border: 1px solid var(--canvas-frame);
+  image-rendering: pixelated;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  cursor: crosshair;
+}
+
+.pixel-canvas.is-picker {
+  cursor: copy;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.panel-section {
+  min-width: 0;
+}
+
+.panel-heading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* 버튼 공통 */
+button,
+select,
+.custom-color {
+  touch-action: manipulation;
+}
+
+.tool-button,
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.tool-button {
+  width: 44px;
+  padding: 0;
+}
+
+.tool-button:hover:not(:disabled),
+.action-button:hover:not(:disabled) {
+  background: var(--surface-hover);
+}
+
+.tool-button[aria-pressed="true"],
+.tool-button[aria-pressed="true"]:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.action-button[aria-pressed="false"] {
+  color: var(--muted);
+}
+
+.action-button[aria-pressed="true"] {
+  border-color: var(--accent);
+}
+
+.tool-button:disabled,
+.action-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.action-button.danger {
+  color: var(--danger);
+}
+
+.action-button.primary,
+.action-button.primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+button:focus-visible,
+select:focus-visible,
+a:focus-visible,
+.custom-input:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.tool-label {
+  display: none;
+}
+
+/* 도구 줄 */
+.tool-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tool-group,
+.history-group {
+  display: flex;
+  gap: 4px;
+}
+
+/* 팔레트 */
+.palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.palette-swatch,
+.custom-color {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.swatch-chip {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--swatch);
+}
+
+.palette-swatch[aria-pressed="true"] .swatch-chip,
+.custom-color.is-selected {
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 5px var(--accent);
+}
+
+.custom-color {
+  width: 36px;
+  height: 36px;
+  margin: 4px;
+  border: 3px solid var(--swatch, var(--border));
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.custom-input {
+  position: absolute;
+  inset: -7px;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.custom-color:focus-within {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.custom-color:focus-within .custom-input:focus-visible {
+  outline: none;
+}
+
+/* 작업 줄 */
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.scale-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.scale-select {
+  min-height: 44px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.875rem;
+}
+
+.save-error {
+  margin: 8px 0 0;
+  font-size: 0.875rem;
+  color: var(--danger);
+}
+
+.save-error a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--accent);
+}
+
+/* 좁은 화면(iframe 카드 약 310px) */
+@media (max-width: 359px) {
+  .app {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .clear-prefix,
+  .scale-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+/* 낮은 화면: h1 숨김, 상단 바 32px */
+@media (max-height: 640px) {
+  .app {
+    padding-top: 4px;
+  }
+
+  .app-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .top-bar {
+    min-height: 32px;
+    margin-bottom: 4px;
+  }
+}
+
+/* 데스크톱 */
+@media (min-width: 768px) {
+  .app {
+    padding-top: 16px;
+  }
+
+  .top-bar {
+    margin-bottom: 16px;
+  }
+
+  .app-title {
+    font-size: 1.25rem;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .pixel-canvas {
+    width: min(480px, calc(100dvh - 300px));
+  }
+
+  .panel {
+    max-width: 320px;
+    gap: 16px;
+  }
+
+  .panel-heading {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0 0 8px;
+    overflow: visible;
+    clip: auto;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  .tool-group,
+  .history-group {
+    flex-wrap: wrap;
+  }
+
+  .tool-button {
+    width: auto;
+    padding: 0 10px;
+  }
+
+  .tool-label {
+    display: inline;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tool-button,
+  .action-button {
+    transition: none;
+  }
+}
